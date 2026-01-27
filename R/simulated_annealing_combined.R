@@ -44,7 +44,8 @@ simulated_annealing_combined <- function(diet, candidate, niter = 5000, bound = 
     set.seed(k)
     s_n <- s_c
     Temp <- Temp0 * 0.9999^k
-    strategy <- sample(1:3, 1)
+    strategy <- 1
+    # strategy <- sample(1:3, 1)
 
     # replace
     if (strategy == 1) {
