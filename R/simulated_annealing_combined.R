@@ -62,11 +62,12 @@ simulated_annealing_combined <- function(diet, candidate, niter = 5000, bound = 
       same_occasions <- s_n[s_n$Occ_Name == s_n$Occ_Name[selected_i], ]
       selected_noni <- sample(nrow(same_occasions), 1)
       
-      target_cols <- unique(c(which(colnames(s_n) == "Food_Description"), 16:129))
-      
-      s_n[selected_i, target_cols] <- same_occasions[selected_noni, target_cols]
+      target_col_names <- colnames(s_n)[16:129]
+      target_col_names <- c("Food_Description", target_col_names)
+      target_col_names <- unique(target_col_names)
+      target_col_names <- target_col_names[target_col_names %in% colnames(s_n)]
+      s_n[selected_i, target_col_names] <- same_occasions[selected_noni, target_col_names]
     }
-
     # add new one
     if (strategy == 2) {
       rows_i <- which(s_n$UserID == df_sum$UserID[candidate] & s_n$RecallNo == df_sum$RecallNo[candidate])
