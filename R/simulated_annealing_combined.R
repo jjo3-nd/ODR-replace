@@ -48,14 +48,23 @@ simulated_annealing_combined <- function(diet, candidate, niter = 5000, bound = 
     # strategy <- sample(1:3, 1)
 
     # replace
+    # if (strategy == 1) {
+    #   rows_i <- which(s_n$UserID == df_sum$UserID[candidate] & s_n$RecallNo == df_sum$RecallNo[candidate])
+    #   selected_i <- sample(rows_i, 1)
+    #   same_occasions <- s_n[s_n$Occ_Name == s_n$Occ_Name[selected_i], ]
+    #   selected_noni <- sample(nrow(same_occasions), 1)
+    #   s_n[selected_i, 16:129] <- same_occasions[selected_noni, 16:129]
+    # }
+    # replace
     if (strategy == 1) {
       rows_i <- which(s_n$UserID == df_sum$UserID[candidate] & s_n$RecallNo == df_sum$RecallNo[candidate])
       selected_i <- sample(rows_i, 1)
       same_occasions <- s_n[s_n$Occ_Name == s_n$Occ_Name[selected_i], ]
       selected_noni <- sample(nrow(same_occasions), 1)
-      # s_n[selected_i, 16:129] <- same_occasions[selected_noni, 16:129]
-      cols_to_replace <- c(which(colnames(s_n) == "Food_Description"), 16:129)
-      s_n[selected_i, cols_to_replace] <- same_occasions[selected_noni, cols_to_replace]
+      
+      target_cols <- unique(c(which(colnames(s_n) == "Food_Description"), 16:129))
+      
+      s_n[selected_i, target_cols] <- same_occasions[selected_noni, target_cols]
     }
 
     # add new one
