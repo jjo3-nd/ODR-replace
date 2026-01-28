@@ -9,7 +9,7 @@
 #' @export
 
 
-simulated_annealing_combined <- function(diet, candidate, niter = 5000, bound = 0.4, diet_score = "HEI2015") {
+simulated_annealing_combined <- function(diet, food_pool, candidate, niter = 5000, bound = 0.4, diet_score = "HEI2015") {
   library(dietaryindex)
   library(dplyr)
 
@@ -57,22 +57,23 @@ simulated_annealing_combined <- function(diet, candidate, niter = 5000, bound = 
     # }
     # replace (검증용 print 추가)
     if (strategy == 1) {
+      # 1. 내 식단에서 바꿀 음식 선택
       rows_i <- which(s_n$UserID == df_sum$UserID[candidate] & s_n$RecallNo == df_sum$RecallNo[candidate])
       selected_i <- sample(rows_i, 1)
-      same_occasions <- s_n[s_n$Occ_Name == s_n$Occ_Name[selected_i], ]
-      selected_noni <- sample(nrow(same_occasions), 1)
       
-      # 교체 전 이름과 바뀔 이름 출력
-      old_food <- s_n$Food_Description[selected_i]
-      new_food <- same_occasions$Food_Description[selected_noni]
-      print(paste("Replacing", old_food, "with", new_food))  # 이 로그를 확인하세요!
+      # 2. [변경점] 같은 시간대(Occ_Name) 필터링 없이, food_pool 전체에서 하나 뽑기
+      selected_noni <- sample(nrow(food_pool), 1)
       
+      # 3. 데이터 덮어쓰기 (이름 + 영양소)
+      # 16~129번 컬럼(영양소) + Food_Description(이름)
       target_col_names <- colnames(s_n)[16:129]
-      target_col_names <- c("Food_Description", target_col_names)
+      target_col_names <- c("Food_Description", target_col_names) 
       target_col_names <- unique(target_col_names)
       target_col_names <- target_col_names[target_col_names %in% colnames(s_n)]
       
-      s_n[selected_i, target_col_names] <- same_occasions[selected_noni, target_col_names]
+      # '아침'이라는 시간표(Occ_Name)는 유지한 채, 음식 내용물만 바뀝니다.
+      # 예: 아침 슬롯에 'Pizza' 데이터가 들어감
+      s_n[selected_i, target_col_names] <- food_pool[selected_noni, target_col_names]
     }
 
     
